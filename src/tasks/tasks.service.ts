@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/auth/user.entity';
 
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
@@ -14,16 +15,16 @@ export class TasksService {
     private tasksRepository: TasksRepository,
   ) {}
 
-  public getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
-    return this.tasksRepository.getTasks(filterDto);
+  public getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
+    return this.tasksRepository.getTasks(filterDto, user);
   }
 
-  public createTask(createTaskDto: CreateTaskDTO): Promise<Task> {
-    return this.tasksRepository.createTask(createTaskDto);
+  public createTask(createTaskDto: CreateTaskDTO, user: User): Promise<Task> {
+    return this.tasksRepository.createTask(createTaskDto, user);
   }
 
-  public async getTaskById(id: string): Promise<Task> {
-    const found = await this.tasksRepository.findOne(id);
+  public async getTaskById(id: string, user: User): Promise<Task> {
+    const found = await this.tasksRepository.findOne({ where: { id, user } });
 
     if (!found) {
       throw new NotFoundException(`Task with ID "${id}" not found`);
@@ -31,8 +32,8 @@ export class TasksService {
     return found;
   }
 
-  public async deleteTask(id: string): Promise<boolean> {
-    const result = await this.tasksRepository.delete(id);
+  public async deleteTask(id: string, user: User): Promise<boolean> {
+    const result = await this.tasksRepository.delete({ id, user });
 
     if (result.affected === 0) {
       throw new NotFoundException(`Task with ID "${id}" not found`);
@@ -41,9 +42,13 @@ export class TasksService {
     return false;
   }
 
-  public async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
+  public async updateTaskStatus(
+    id: string,
+    status: TaskStatus,
+    user: User,
+  ): Promise<Task> {
     // var task = this.tasks.find((t) => t.id === id);
-    var task = await this.getTaskById(id);
+    const task = await this.getTaskById(id, user);
 
     task.status = status;
 
