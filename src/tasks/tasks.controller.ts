@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -22,6 +23,7 @@ import { TasksService } from './tasks.service';
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
+  private logger: Logger = new Logger('TaskController', { timestamp: true });
   constructor(private tasksService: TasksService) {}
 
   @Get()
@@ -30,6 +32,7 @@ export class TasksController {
     @GetUser() user: User,
   ): Promise<Task[]> {
     // console.log(filterDto + ', ' + Object.keys(filterDto).length);
+    this.logger.debug({ filterDto, user });
     return this.tasksService.getTasks(filterDto, user);
   }
 
