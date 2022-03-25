@@ -22,8 +22,17 @@ async function bootstrap() {
   // logger.debug(configService.get('STAGE_ENV_FILE'));
   // logger.debug(process.env.STAGE_ENV_FILE);
   // logger.debug('==========================================');
-  logger.debug(configService.get('STAGE'));
+  logger.debug('STAGE=' + configService.get('STAGE'));
   // logger.debug(process.env.STAGE);
   logger.debug('==========================================');
+  logger.debug({
+    'env.stage.dev.DB_SETTINGS': {
+      host: configService.get('DB_HOST'),
+      port: configService.get('DB_PORT'),
+      username: configService.get('DB_USERNAME'),
+      password: configService.get('DB_PASSWORD'),
+      database: configService.get('DB_DATABASE'),
+    },
+  });
 }
 bootstrap();
